@@ -1,17 +1,24 @@
 \documentclass[19pt,landscape,twocolumn]{article}
 
+% PDF Bauen: pdflatex ./couchdb-cheat-sheet.tex
+
 % fonts
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
-\usepackage{times}
-\usepackage{pifont} % use it with \ding{number} | http://en.wikibooks.org/wiki/LaTeX/Formatting
+\usepackage[german]{babel}
 
 % document format
 \usepackage{lscape}
 \usepackage[top=1cm, bottom=1.5cm, left=1cm, right=1cm]{geometry}
+\setlength{\parskip}{1.65mm plus0mm minus1mm}
+
+% listings
+\usepackage{fancyvrb} % http://ftp.math.purdue.edu/mirrors/ctan.org/macros/latex/contrib/fancyvrb/fancyvrb.pdf
+\usepackage{color} % http://en.wikibooks.org/wiki/LaTeX/Colors
+\definecolor{midnightblue}{rgb}{0.098,0.098,0.439}
 
 % footer
-\usepackage{fancyhdr}
+\usepackage{fancyhdr} % ftp://ftp.mpi-sb.mpg.de/pub/tex/mirror/ftp.dante.de/pub/tex/macros/latex/contrib/fancyhdr/fancyhdr.pdf
 \pagestyle{fancyplain}
 \fancyhf{}
 \renewcommand{\headrulewidth}{0pt}
@@ -19,14 +26,20 @@
 \lfoot{\fancyplain{}{CouchDB Cheat Sheet - Andreas Wenk}}
 \rfoot{\fancyplain{}{\thepage}}
 
+% URLs
+\usepackage[pdfborder={0 0 0},urlcolor=blue,colorlinks=true,citecolor=blue]{hyperref}
+
 % section formatting
 \usepackage{titlesec}
 \titleformat{\section}{\bf\fontsize{12}{12}\selectfont}{\thesection\quad}{0em}{}
 \titleformat{\subsection}{\bf\fontsize{10}{10}\selectfont}{\thesubsection\quad}{0em}{}
 
-% defined commands
+% my commands
 \newcommand{\mono}[1]{\texttt{\textendash\textendash {#1}}}
 \newcommand{\htmlverb}[1]{{[}\textbf{{#1}}{]}}
+\newcommand{\brackets}[1]{{[}{#1}{]}}
+
+\DefineVerbatimEnvironment{code}{Verbatim}{fontsize=\small,xleftmargin=5mm,formatcom=\color{midnightblue}}
 
 \begin{document}
 % set the font size for the whole document
@@ -34,65 +47,104 @@
 
 % title
 \title{CouchDB-Cheat-Sheet}
-\author{Andreas Wenk -- Version: 0.0.1 -- August 2011}
+\author{Andreas Wenk -- Version: 0.1.0 -- August 2011}
 \date{}
 \maketitle
 
 \begin{abstract}
-Dieses Cheat-Sheet ist eine Übersicht der RESTful CouchDB-API.
+Dieses Cheat-Sheet ist eine Übersicht der RESTful API von CouchDB \cite{1}. Das Ziel ist es,
+die gebräuchlichsten Requests jeweils anhand eines Beispiels zu zeigen. Unter \cite{2}
+ist eine CouchDB zu finden, in der die Beispiele nachgestellt werden können (Basic-Auth: ohne 
+Daten `ok' klicken). 
+
+Eine recht gute API Referenz ist unter \cite{3} zu finden.
+
+Damit die Listings so kurz als möglich sind, heisst die Datenbank, die als Beispiel dienen
+soll `kina'. Die Grundstruktur der Dokumente in dieser Datenbank ist folgendermaßen:
+
+\begin{code}
+{
+   "_id": "fab911e6e9ed703bf536dccffe000937",
+   "_rev": "1-183f162a09532ccacf8223f6e2ba95f6",
+   "lang": "javascript"
+}
+\end{code}
+
+Alle Beispiel-Requests werden unter Verwendung von cURL \cite{10} erstellt. Natürlich kann auch das von 
+CouchDB mitgelieferte Webinterface `Futon' genutzt werden. Allerdings rate ich davon ab, da 
+bei der Verwendung von cURL die Betrachtung der HTTP-Response zu wesentlich mehr Verständnis führt.
 \end{abstract}
 
 \section{Überblick}
 
-\section{Datenbanken}
-\subsection{Datenbankinformationen erhalten \htmlverb{GET}}
-\begin{quote}
-\begin{verbatim}
-curl -X GET http://127.0.0.1:5984/datenbankname
-{"db_name":"datenbankname",
- "doc_count":21,
- "doc_del_count":56,
- "update_seq":454,
- "purge_seq":0,
- "compact_running":false,
- "disk_size":454750,
- "instance_start_time":"1311337314684694",
- "disk_format_version":5,
- "committed_update_seq":454}
-\end{verbatim}
-\end{quote}
+CouchDB ist eine dokumentbasierte Datenbank und gehört zur Gruppe der NoSQL Datenbanken. CouchDB
+ist ein Apache Open-Source Projekt und liegt aktuell in der Version 1.1.0 vor. Einige wichtige 
+Merkmale von CouchDB sind:
 
-\subsection{Alle Datenbanken im Cluster \htmlverb{GET}}
-\begin{quote}
-\begin{verbatim}
+\begin{itemize}
+  \setlength{\parskip}{0pt}
+  \item in Erlang \cite{4} geschrieben
+  \item schemalos
+  \item API: HTTP Rest \cite{5}
+  \item implementiert ACID \cite{6} über MVCC \cite{7}
+  \item CAP Theorem \cite{8}:
+    \begin{itemize} 
+      \item A (Availability) - ja
+      \item P (Partition Tolerance) - ja
+      \item C (Consistency) -> Eventual Consistency
+    \end{itemize}
+  \item MapReduce \cite{9} für Views
+  \item Asynchrone Replikation in beide Richtungen - Master / Master
+  \item Revisions Management
+\end{itemize}
+
+\section{Datenbanken}
+\subsection{Alle Datenbanken im Cluster \htmlverb{GET} \htmlverb{\_all\_dbs}}
+
+\begin{code}
 curl -X GET http://127.0.0.1:5984/_all_dbs
 ["_replicator","_users"]
-\end{verbatim}
-\end{quote}
+\end{code}
 
 \subsection{Datenbank erstellen \htmlverb{PUT}}
-\begin{quote}
-\begin{verbatim}
-curl -X PUT http://127.0.0.1:5984/datenbankname
+
+\begin{code}
+curl -X PUT http://127.0.0.1:5984/kina
 {"ok": true}
-\end{verbatim}
-\end{quote}
+\end{code}
+
+\subsection{Datenbankinformationen erhalten \htmlverb{GET}}
+
+\begin{code}
+curl -X GET http://127.0.0.1:5984/kina
+{"db_name":"kina",
+ "doc_count":0,
+ "doc_del_count":0,
+ "update_seq":0,
+ "purge_seq":0,
+ "compact_running":false,
+ "disk_size":79,
+ "instance_start_time":"1312577294992829",
+ "disk_format_version":5,
+ "committed_update_seq":0}
+\end{code}
 
 \subsection{Datenbank löschen \htmlverb{DELETE}}
-\begin{quote}
-\begin{verbatim}
-curl -X DELETE http://127.0.0.1:5984/datenbankname
-{"ok": true}
-\end{verbatim}
-\end{quote}
 
-\subsection{Datenbank replizieren \htmlverb{POST}}
-\begin{quote}
-\begin{verbatim}
+\begin{code}
+curl -X DELETE http://127.0.0.1:5984/kina
+{"ok": true}
+\end{code}
+
+\subsection{Datenbank replizieren \htmlverb{POST} \htmlverb{\_replicate}}
+\emph{(options)} create\_target:true, cancel:true, continuous:true
+
+\begin{code}
 curl -X POST http://127.0.0.1:5984/_replicate 
      -H "content-type:application/json" 
-     -d '{"source": "datenbankname", 
-          "target": "datenbankname_neu"}'
+     -d '{"source": "kina", 
+          "target": "anik",
+          "create_target": true}'
 {"ok":true, "session_id":"f75eb944bac70f40e77953f484afb64c", 
  "source_last_seq":36, "history":
    [{"session_id":"f75eb944bac70f40e77953f484afb64c",
@@ -108,77 +160,243 @@ curl -X POST http://127.0.0.1:5984/_replicate
      "doc_write_failures":0
   }]
 }
-\end{verbatim}
-\end{quote}
+\end{code}
+
+\subsection{Datenbank replizieren - filter}
+\emph{(options)} filter:filter\_name, query\_params:\{filter\_name:query\_param\},\newline
+doc\_ids: \brackets{docid\_1,docid\_2,docid\_n} \newline
+
+Filter werden in \_design Dokumenten erstellt. Ein Filter kann später bei der Replikation genutzt werden, um nur
+Dokumente zu replizieren, die den im Filter hinterlegten Kriterien entsprechen.
+
+Filter erstellen:
+
+\begin{code}
+curl -X PUT http://127.0.0.1:5984/kina/_design/default \
+  -H "content-type: application/json" \
+  -d '{"filters":{
+        "lang": 
+          "function(doc, req) { 
+            return \"javascript\" == doc.lang 
+          }"
+        }
+     }'
+\end{code}
+
+Filter anwenden (davon ausgehend, es gibt drei Dokumente mit lang = javascript):
+
+\begin{code}
+curl -X POST http://127.0.0.1:5984/_replicate
+     -H "content-type:application/json"
+     -d '{"source": "kina",
+          "target": "anik",
+          "create_target": true,
+          "filter": "default/lang"}'
+{"ok":true,"session_id":"3546d87233636b04440e6e023c3e3018",
+ "source_last_seq":6,
+ "replication_id_version":2, "history":
+  [{"session_id":"3546d87233636b04440e6e023c3e3018",
+    [...]
+    "docs_read":3,
+    "docs_written":3,
+    "doc_write_failures":0
+  }]
+}
+\end{code}
+
+Filter erstellen mit dynamischem Parameter (Auszug):
+
+\begin{code}
+curl [...]
+  -d '{"filters":{
+       "lang":·
+         "function(doc, req) {·
+           return req.query.lang == doc.lang·
+         }"
+       }
+    }'
+\end{code}
+
+Filter anwenden (Auszug):
+
+\begin{code}
+curl [...]
+  -d '{"source": "kina",
+       "target": "anik",
+       "create_target": true,
+       "query_params": {
+          "lang":"javascript"
+       }
+     }'
+\end{code}
+
+Filter andwenden unter Angabe von genauen Dokument IDs (Auszug):
+
+\begin{code}
+curl [...]
+  -d '{"source": "kina",
+       "target": "anik",
+       "create_target": true,
+       "doc_ids": ["id_1", "id_2", "id_n"]
+     }'
+\end{code}
+
+\subsection{Änderungen in der DB verfolgen \htmlverb{GET} \htmlverb{\_changes}}
+\emph{(params)} since=\brackets{sequence\_number}, style=all\_docs, limit=\brackets{n}, \newline
+feed=\brackets{continuous,longpolling}, heartbeat=\brackets{milliseconds} \newline
+filter=filter\_name, include\_docs=\brackets{true,false}, timeout=\brackets{milliseconds}
+
+\begin{code}
+curl -X GET "http://127.0.0.1:5984/kina/_changes \
+  ?feed=continuous&heartbeat=2000"
+{"seq":3,"id":"kn0001","changes": \
+  [{"rev":"3-5570e8bbb34412db757c2df4bfa1099b"}]}
+{"seq":4,"id":"fab911e6e9ed703bf536dccffe000937","changes": \ 
+  [{"rev":"1-183f162a09532ccacf8223f6e2ba95f6"}]}
+[...]
+\end{code}
+
+\subsection{Compaction: Datenbank \htmlverb{POST} \htmlverb{\_compact}}
+
+\begin{code}
+curl -X POST http://127.0.0.1:5984/kina/_compact \
+  -H "content-type:application/json"
+{"ok":true}
+\end{code}
+
+\subsection{Compaction: Design Dokumente \htmlverb{POST} \htmlverb{\_compact/design-doc}}
+
+\begin{code}
+curl -X POST http://127.0.0.1:5984/kina/_compact/default \
+  -H "content-type:application/json"
+{"ok":true}
+\end{code}
+
+\subsection{Compaction: Views \htmlverb{POST} \htmlverb{\_view\_cleanup}}
+
+\begin{code}
+curl -X POST http://127.0.0.1:5984/kina/_view_cleanup \
+  -H "content-type:application/json"
+{"ok":true}
+\end{code}
 
 \section{Dokumente}
-\subsection{UUIDs ausgeben \htmlverb{GET}}
+Prinzipiell sollte beim Erstellen auf IDs zurückgegriffen werden, die CouchDB 
+generiert. Allerdings macht es in manchen Fällen auch Sinn eigene IDs zu nutzen.
+
+\subsection{UUIDs ausgeben \htmlverb{GET} \htmlverb{\_uuids}}
 \emph{(params)} count={[}n{]}
-\begin{quote}
-\begin{verbatim}
+
+\begin{code}
 curl -X GET http://127.0.0.1:5984/_uuids?count=3
 {"uuids":
   ["b7fc0ca7dffcc6d0f240c1e5bb000998",
    "b7fc0ca7dffcc6d0f240c1e5bb000fe8",
    "b7fc0ca7dffcc6d0f240c1e5bb001c9a"]
 }
-\end{verbatim}
-\end{quote}
+\end{code}
 
-\subsection{Alle Dokumente erhalten \htmlverb{GET}}
-\emph{(params)} descending=true
+\subsection{Alle Dokumente erhalten \htmlverb{GET} \htmlverb{\_all\_docs}}
+\emph{(params)} descending=true, key=\brackets{key}, startkey=\brackets{key}, startkey\_docid=\brackets{docid}, \newline
+endkey=\brackets{key}, endkey\_docid=\brackets{docid}, \newline
+group=\brackets{true,false}, group\_level=\brackets{0-n}, inclusive\_end=\brackets{true,false}, \newline
+limit=\brackets{n}, reduce=\brackets{true,false}, skip=\brackets{n}, stale=ok, \newline
+update\_seq=\brackets{true,false}
 
-\subsection{Dokument erstellen \htmlverb{PUT}}
-\begin{quote}
-\begin{verbatim}
-curl -X PUT http://127.0.0.1:5984/datenbankname/ \
+\begin{code}
+curl -X GET http://127.0.0.1:5984/kina/_all_docs
+{"total_rows":12,"offset":0,"rows":[
+{"id":"7341477ce373f9cc76f351e5980008bb",
+ "key":"7341477ce373f9cc76f351e5980008bb",
+ "value":{"rev":"2-f0bfca3976ad04bce05b2ade242519d7"}},
+{"id":"7341477ce373f9cc76f351e5980015cd",
+ "key":"7341477ce373f9cc76f351e5980015cd",
+ "value":{"rev":"2-d6f5f2cb326c1f68f95d2bfbef329280"}},
+[...]
+\end{code}
+
+\subsection{Mehrere Dokumente mit key(id) erhalten \htmlverb{POST} \htmlverb{\_all\_docs}}
+\emph{(params)} siehe: Alle Dokumente erhalten \newline
+\emph{(!)} gut nutzbar, um mit einem Request mehrere Dokumente zu erhalten
+
+\begin{code}
+curl -X POST http://127.0.0.1:5984/kina/_all_docs?include_docs=true 
+  -H "content-type:application/json" 
+  -d '{"keys": [
+        "fab911e6e9ed703bf536dccffe000937", 
+        "7341477ce373f9cc76f351e5980015cd"
+      ]}'
+{"total_rows":12,"offset":0,"rows":[
+  {"id":"fab911e6e9ed703bf536dccffe000937",
+   "key":"fab911e6e9ed703bf536dccffe000937",
+   "value":{"rev":"1-183f162a09532ccacf8223f6e2ba95f6"},
+   "doc":{"_id":"fab911e6e9ed703bf536dccffe000937",
+   "_rev":"1-183f162a09532ccacf8223f6e2ba95f6",
+   "lang":"javascript"}},
+  {"id":"7341477ce373f9cc76f351e5980015cd",
+   "key":"7341477ce373f9cc76f351e5980015cd",
+   "value":{"rev":"3-99b698d0caba3c9892a385dd0efe2a3d"},
+   "doc":{"_id":"7341477ce373f9cc76f351e5980015cd",
+   "_rev":"3-99b698d0caba3c9892a385dd0efe2a3d",
+   "lang":"lisp"}}
+]}
+\end{code}
+
+\subsection{Dokument erstellen mit CouchDB ID \htmlverb{PUT}}
+
+\begin{code}
+curl -X PUT http://127.0.0.1:5984/kina/ \
   b7fc0ca7dffcc6d0f240c1e5bb000998
 {"ok":true,"id":"b7fc0ca7dffcc6d0f240c1e5bb000998",
  "rev":"1-967a00dff5e02add41819138abb3284d"}
-\end{verbatim}
-\end{quote}
+\end{code}
+
+\subsection{Dokument erstellen mit eigener ID \htmlverb{PUT}}
+
+\begin{code}
+curl -X PUT http://127.0.0.1:5984/kina/kn0001 -d '{}'
+{"ok":true,"id":"kn0001",
+ "rev":"3-5570e8bbb34412db757c2df4bfa1099b"}
+\end{code}
 
 \subsection{Dokument erstellen \htmlverb{POST}}
-\begin{quote}
-\begin{verbatim}
-curl -X POST http://127.0.0.1:5984/datenbankname/
+
+\begin{code}
+curl -X POST http://127.0.0.1:5984/kina/
      -H "content-type: application/json"
      -d '{}'
 {"ok":true,"id":"b7fc0ca7dffcc6d0f240c1e5bb000fe8",
  "rev":"1-367b00dfc5e02axd41819138abb3284d"}
-\end{verbatim}
-\end{quote}
+\end{code}
 
 \subsection{Dokument anfragen \htmlverb{GET}}
 \emph{(params)} rev={[}revision{]}, revs=true, revs\_info=true
-\begin{quote}
-\begin{verbatim}
-curl -X GET http://127.0.0.1:5984/datenbankname/ \
+
+\begin{code}
+curl -X GET http://127.0.0.1:5984/kina/ \
   b7fc0ca7dffcc6d0f240c1e5bb000998
 {"_id":"b7fc0ca7dffcc6d0f240c1e5bb000998",
  "_rev":"1-367b00dfc5e02axd41819138abb3284d",
  "inhalt":"hier steht was"}
-\end{verbatim}
-\end{quote}
+\end{code}
 
 \subsection{Dokument erweitern / aktualisieren \htmlverb{PUT}}
-\begin{quote}
-\begin{verbatim}
-curl -X PUT http://127.0.0.1:5984/datenbankname/ \
+
+\begin{code}
+curl -X PUT http://127.0.0.1:5984/kina/ \
   b7fc0ca7dffcc6d0f240c1e5bb000998
      -d '{"_rev":"1-367b00dfc5e02axd41819138abb3284d",
           "neuer Inhalt": "kommt hier hin",
           "inhalt": "bestehender wird aktualisiert"}'
 {"ok":true,"id":"7fc0ca7dffcc6d0f240c1e5bb000998",
  "rev":"2-53f21467344e4cb88384fc9e2e189049"}
-\end{verbatim}
-\end{quote}
+\end{code}
 
 \subsection{Dokument-Attachment speichern \htmlverb{PUT}}
 \emph{(!)} generell könnte auch nur die Option \mono{data} für eine reine Textdatei verwendet werden
-\begin{quote}
-\begin{verbatim}
-curl -X PUT http://127.0.0.1:5984/datenbankname/ \
+
+\begin{code}
+curl -X PUT http://127.0.0.1:5984/kina/ \
   b7fc0ca7dffcc6d0f240c1e5bb000998/ \
   geburtstag.txt?rev=2-53f21467344e4cb88384fc9e2e189049
      --data-binary @geburtstag.txt
@@ -195,24 +413,87 @@ Cache-Control: must-revalidate
 
 {"ok":true,"id":"b7fc0ca7dffcc6d0f240c1e5bb000998",
  "rev":"3-d5171a67e9e27aeba9beac32149a86a9"}
-\end{verbatim}
-\end{quote}
+\end{code}
 
 \subsection{Dokument löschen \htmlverb{DELETE}}
-\begin{quote}
-\begin{verbatim}
-curl -X DELETE http://127.0.0.1:5984/datenbankname/ \
-  b7fc0ca7dffcc6d0f240c1e5bb000998 \
-  ?rev=3-d5171a67e9e27aeba9beac32149a86a9
-{"ok":true,"id":"b7fc0ca7dffcc6d0f240c1e5bb000998",
- "rev":"3-d5171a67e9e27aeba9beac32149a86a9"}
-\end{verbatim}
-\end{quote}
+\emph{(!)} Dokument wird nur aus dem Index gelöscht und markiert mit \mono{deleted:true}
+
+\begin{code}
+curl -X DELETE http://127.0.0.1:5984/kina/ \
+  7341477ce373f9cc76f351e598001cdd \
+  ?rev=1-9533bf3b3c5cda717ed000b186fdafae
+{"ok":true,"id":"7341477ce373f9cc76f351e598001cdd",
+ "rev":"2-5c7fb5dfeaf6f7cea149922fa1cdaf96"}
+\end{code}
+
+\subsection{Dokument permanent löschen \htmlverb{POST} \htmlverb{\_purge}}
+\emph{(!)} Refernez zum Dokument wird gelöscht; wird nicht repliziert, um den
+Plattenplatz auch frei zu bekommen, muss \mono{\_compact} ausgeführt werden
+
+\begin{code}
+curl -X POST http://127.0.0.1:5984/kina/_purge/ 
+  -H "content-type:application/json" 
+  -d '{"7341477ce373f9cc76f351e598001cdd": 
+        ["2-5c7fb5dfeaf6f7cea149922fa1cdaf96"]
+     }'
+{"purge_seq":1,"purged":{
+  "7341477ce373f9cc76f351e598001cdd":
+    ["2-5c7fb5dfeaf6f7cea149922fa1cdaf96"]
+  }
+}
+\end{code}
 
 \subsection{Dokument Info \htmlverb{HEAD}}
 
 \subsection{Dokument kopieren \htmlverb{COPY}}
 
-\subsection{Mehrere Dokumente gleichzeitig anlegen \htmlverb{POST}}
+\subsection{Mehrere Dokumente anlegen \htmlverb{POST} \htmlverb{\_bulk\_docs}}
+\emph{(options)} all\_or\_nothing:\brackets{true,false (=non-atomic=default)}, docs:\brackets{key:value,...}
+
+\begin{code}
+curl -X POST http://127.0.0.1:5984/kina/_bulk_docs \
+  -H "content-type:application/json" \
+  -d '{"docs":[
+        {"lang":"c"}, 
+        {"lang":"c++"}
+     ]}'
+[{"id":"7341477ce373f9cc76f351e5980008bb",
+  "rev":"1-f491c132ea24ecf492e0b5ae18467876"},
+ {"id":"7341477ce373f9cc76f351e5980015cd",
+  "rev":"1-9533bf3b3c5cda717ed000b186fdafae"}]
+\end{code}
+
+\subsection{Mehrere Dokumente aktualisieren \htmlverb{POST} \htmlverb{\_bulk\_docs}}
+\emph{(options)} all\_or\_nothing:\brackets{true,false (=non-atomic=default)}, docs:\brackets{key:value,...}
+
+\begin{code}
+curl -X POST http://127.0.0.1:5984/kina/_bulk_docs \
+  -H "content-type:application/json" \
+  -d '{"docs":[
+        {"_id":"7341477ce373f9cc76f351e5980008bb",
+         "_rev": "1-f491c132ea24ecf492e0b5ae18467876",
+         "lang":"erlang"},
+        {"_id":"7341477ce373f9cc76f351e5980015cd",
+         "_rev":"1-9533bf3b3c5cda717ed000b186fdafae",
+         "lang":"lisp"}
+    ]}'
+[{"id":"7341477ce373f9cc76f351e5980008bb",
+  "rev":"2-f0bfca3976ad04bce05b2ade242519d7"},
+ {"id":"7341477ce373f9cc76f351e5980015cd",
+  "rev":"2-d6f5f2cb326c1f68f95d2bfbef329280"}]
+\end{code}
+
+\begin{thebibliography}{sotief}
+\bibitem{1}\url{http://couchdb.apache.org}
+\bibitem{2}\url{https://cloudant.com/futon/database.html?andywenk%2Fkina}
+\bibitem{3}\url{http://www.couchbase.org/sites/default/files/uploads/all/documentation/couchbase-api.html}
+\bibitem{4}\url{http://www.erlang.org}
+\bibitem{5}\url{http://en.wikipedia.org/wiki/Representational_State_Transfer}
+\bibitem{6}\url{http://en.wikipedia.org/wiki/ACID}
+\bibitem{7}\url{http://en.wikipedia.org/wiki/Multiversion_concurrency_control}
+\bibitem{8}\url{http://www.julianbrowne.com/article/viewer/brewers-cap-theorem}
+\bibitem{9}\url{http://en.wikipedia.org/wiki/MapReduce}
+\bibitem{10}\url{http://curl.haxx.se/}
+\end{thebibliography}
 
 \end{document}

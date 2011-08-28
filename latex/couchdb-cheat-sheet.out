@@ -1,0 +1,28 @@
+\BOOKMARK [1][-]{section.1}{\334berblick}{}% 1
+\BOOKMARK [1][-]{section.2}{Datenbanken}{}% 2
+\BOOKMARK [2][-]{subsection.2.1}{Alle Datenbanken im Cluster [GET] [\137all\137dbs]}{section.2}% 3
+\BOOKMARK [2][-]{subsection.2.2}{Datenbank erstellen [PUT]}{section.2}% 4
+\BOOKMARK [2][-]{subsection.2.3}{Datenbankinformationen erhalten [GET]}{section.2}% 5
+\BOOKMARK [2][-]{subsection.2.4}{Datenbank l\366schen [DELETE]}{section.2}% 6
+\BOOKMARK [2][-]{subsection.2.5}{Datenbank replizieren [POST] [\137replicate]}{section.2}% 7
+\BOOKMARK [2][-]{subsection.2.6}{Datenbank replizieren - filter}{section.2}% 8
+\BOOKMARK [2][-]{subsection.2.7}{\304nderungen in der DB verfolgen [GET] [\137changes]}{section.2}% 9
+\BOOKMARK [2][-]{subsection.2.8}{Compaction: Datenbank [POST] [\137compact]}{section.2}% 10
+\BOOKMARK [2][-]{subsection.2.9}{Compaction: Design Dokumente [POST] [\137compact/design-doc]}{section.2}% 11
+\BOOKMARK [2][-]{subsection.2.10}{Compaction: Views [POST] [\137view\137cleanup]}{section.2}% 12
+\BOOKMARK [1][-]{section.3}{Dokumente}{}% 13
+\BOOKMARK [2][-]{subsection.3.1}{UUIDs ausgeben [GET] [\137uuids]}{section.3}% 14
+\BOOKMARK [2][-]{subsection.3.2}{Alle Dokumente erhalten [GET] [\137all\137docs]}{section.3}% 15
+\BOOKMARK [2][-]{subsection.3.3}{Mehrere Dokumente mit key\(id\) erhalten [POST] [\137all\137docs]}{section.3}% 16
+\BOOKMARK [2][-]{subsection.3.4}{Dokument erstellen mit CouchDB ID [PUT]}{section.3}% 17
+\BOOKMARK [2][-]{subsection.3.5}{Dokument erstellen mit eigener ID [PUT]}{section.3}% 18
+\BOOKMARK [2][-]{subsection.3.6}{Dokument erstellen [POST]}{section.3}% 19
+\BOOKMARK [2][-]{subsection.3.7}{Dokument anfragen [GET]}{section.3}% 20
+\BOOKMARK [2][-]{subsection.3.8}{Dokument erweitern / aktualisieren [PUT]}{section.3}% 21
+\BOOKMARK [2][-]{subsection.3.9}{Dokument-Attachment speichern [PUT]}{section.3}% 22
+\BOOKMARK [2][-]{subsection.3.10}{Dokument l\366schen [DELETE]}{section.3}% 23
+\BOOKMARK [2][-]{subsection.3.11}{Dokument permanent l\366schen [POST] [\137purge]}{section.3}% 24
+\BOOKMARK [2][-]{subsection.3.12}{Dokument Info [HEAD]}{section.3}% 25
+\BOOKMARK [2][-]{subsection.3.13}{Dokument kopieren [COPY]}{section.3}% 26
+\BOOKMARK [2][-]{subsection.3.14}{Mehrere Dokumente anlegen [POST] [\137bulk\137docs]}{section.3}% 27
+\BOOKMARK [2][-]{subsection.3.15}{Mehrere Dokumente aktualisieren [POST] [\137bulk\137docs]}{section.3}% 28
