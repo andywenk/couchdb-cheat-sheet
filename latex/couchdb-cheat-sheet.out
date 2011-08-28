@@ -19,10 +19,12 @@
 \BOOKMARK [2][-]{subsection.3.6}{Dokument erstellen [POST]}{section.3}% 19
 \BOOKMARK [2][-]{subsection.3.7}{Dokument anfragen [GET]}{section.3}% 20
 \BOOKMARK [2][-]{subsection.3.8}{Dokument erweitern / aktualisieren [PUT]}{section.3}% 21
-\BOOKMARK [2][-]{subsection.3.9}{Dokument-Attachment speichern [PUT]}{section.3}% 22
-\BOOKMARK [2][-]{subsection.3.10}{Dokument l\366schen [DELETE]}{section.3}% 23
-\BOOKMARK [2][-]{subsection.3.11}{Dokument permanent l\366schen [POST] [\137purge]}{section.3}% 24
-\BOOKMARK [2][-]{subsection.3.12}{Dokument Info [HEAD]}{section.3}% 25
-\BOOKMARK [2][-]{subsection.3.13}{Dokument kopieren [COPY]}{section.3}% 26
-\BOOKMARK [2][-]{subsection.3.14}{Mehrere Dokumente anlegen [POST] [\137bulk\137docs]}{section.3}% 27
-\BOOKMARK [2][-]{subsection.3.15}{Mehrere Dokumente aktualisieren [POST] [\137bulk\137docs]}{section.3}% 28
+\BOOKMARK [2][-]{subsection.3.9}{Dokument l\366schen [DELETE]}{section.3}% 22
+\BOOKMARK [2][-]{subsection.3.10}{Dokument-Attachment speichern [PUT]}{section.3}% 23
+\BOOKMARK [2][-]{subsection.3.11}{Dokument-Attachment anfragen [GET]}{section.3}% 24
+\BOOKMARK [2][-]{subsection.3.12}{Dokument-Attachment l\366schen [DELETE]}{section.3}% 25
+\BOOKMARK [2][-]{subsection.3.13}{Dokument permanent l\366schen [POST] [\137purge]}{section.3}% 26
+\BOOKMARK [2][-]{subsection.3.14}{Dokument Info [HEAD]}{section.3}% 27
+\BOOKMARK [2][-]{subsection.3.15}{Dokument kopieren [COPY]}{section.3}% 28
+\BOOKMARK [2][-]{subsection.3.16}{Mehrere Dokumente anlegen [POST] [\137bulk\137docs]}{section.3}% 29
+\BOOKMARK [2][-]{subsection.3.17}{Mehrere Dokumente aktualisieren [POST] [\137bulk\137docs]}{section.3}% 30

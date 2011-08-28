@@ -10,12 +10,13 @@
 % document format
 \usepackage{lscape}
 \usepackage[top=1cm, bottom=1.5cm, left=1cm, right=1cm]{geometry}
-\setlength{\parskip}{1.65mm plus0mm minus1mm}
+\setlength{\parskip}{1.65mm plus0mm minus2mm}
 
 % listings
 \usepackage{fancyvrb} % http://ftp.math.purdue.edu/mirrors/ctan.org/macros/latex/contrib/fancyvrb/fancyvrb.pdf
 \usepackage{color} % http://en.wikibooks.org/wiki/LaTeX/Colors
 \definecolor{midnightblue}{rgb}{0.098,0.098,0.439}
+\definecolor{grey}{RGB}{97,97,97}
 
 % footer
 \usepackage{fancyhdr} % ftp://ftp.mpi-sb.mpg.de/pub/tex/mirror/ftp.dante.de/pub/tex/macros/latex/contrib/fancyhdr/fancyhdr.pdf
@@ -38,8 +39,11 @@
 \newcommand{\mono}[1]{\texttt{\textendash\textendash {#1}}}
 \newcommand{\htmlverb}[1]{{[}\textbf{{#1}}{]}}
 \newcommand{\brackets}[1]{{[}{#1}{]}}
+\newcommand{\setparskip}{\setlength{\parskip}{-6mm}}
+\newcommand{\resetparskip}{\setlength{\parskip}{1mm}}
 
 \DefineVerbatimEnvironment{code}{Verbatim}{fontsize=\small,xleftmargin=5mm,formatcom=\color{midnightblue}}
+\DefineVerbatimEnvironment{response}{Verbatim}{baseline=t,fontsize=\footnotesize,xleftmargin=5mm,formatcom=\color{grey}}
 
 \begin{document}
 % set the font size for the whole document
@@ -103,20 +107,31 @@ Merkmale von CouchDB sind:
 
 \begin{code}
 curl -X GET http://127.0.0.1:5984/_all_dbs
-["_replicator","_users"]
 \end{code}
+\setparskip
+\begin{response}
+["_replicator","_users"]
+\end{response}
+\resetparskip
 
 \subsection{Datenbank erstellen \htmlverb{PUT}}
 
 \begin{code}
 curl -X PUT http://127.0.0.1:5984/kina
-{"ok": true}
 \end{code}
+\setparskip
+\begin{response}
+{"ok": true}
+\end{response}
+\resetparskip
 
 \subsection{Datenbankinformationen erhalten \htmlverb{GET}}
 
 \begin{code}
 curl -X GET http://127.0.0.1:5984/kina
+\end{code}
+\setparskip
+\begin{response}
 {"db_name":"kina",
  "doc_count":0,
  "doc_del_count":0,
@@ -127,28 +142,36 @@ curl -X GET http://127.0.0.1:5984/kina
  "instance_start_time":"1312577294992829",
  "disk_format_version":5,
  "committed_update_seq":0}
-\end{code}
+\end{response}
+\resetparskip
 
 \subsection{Datenbank löschen \htmlverb{DELETE}}
 
 \begin{code}
 curl -X DELETE http://127.0.0.1:5984/kina
-{"ok": true}
 \end{code}
+\setparskip
+\begin{response}
+{"ok": true}
+\end{response}
+\resetparskip
 
 \subsection{Datenbank replizieren \htmlverb{POST} \htmlverb{\_replicate}}
 \emph{(options)} create\_target:true, cancel:true, continuous:true
 
 \begin{code}
-curl -X POST http://127.0.0.1:5984/_replicate 
-     -H "content-type:application/json" 
-     -d '{"source": "kina", 
+curl -X POST http://127.0.0.1:5984/_replicate
+     -H "content-type:application/json"
+     -d '{"source": "kina",
           "target": "anik",
           "create_target": true}'
-{"ok":true, "session_id":"f75eb944bac70f40e77953f484afb64c", 
+\end{code}
+\setparskip
+\begin{response}
+{"ok":true, "session_id":"f75eb944bac70f40e77953f484afb64c",
  "source_last_seq":36, "history":
    [{"session_id":"f75eb944bac70f40e77953f484afb64c",
-     "start_time":"Thu, 14 Apr 2011 20:36:12 GMT", 
+     "start_time":"Thu, 14 Apr 2011 20:36:12 GMT",
      "end_time":"Thu, 14 Apr 2011 20:36:12 GMT",
      "start_last_seq":0,
      "end_last_seq":36,
@@ -160,7 +183,8 @@ curl -X POST http://127.0.0.1:5984/_replicate
      "doc_write_failures":0
   }]
 }
-\end{code}
+\end{response}
+\resetparskip
 
 \subsection{Datenbank replizieren - filter}
 \emph{(options)} filter:filter\_name, query\_params:\{filter\_name:query\_param\},\newline
@@ -175,8 +199,8 @@ Filter erstellen:
 curl -X PUT http://127.0.0.1:5984/kina/_design/default \
   -H "content-type: application/json" \
   -d '{"filters":{
-        "lang": 
-          "function(doc, req) { 
+        "lang":
+          "function(doc, req) {
             return \"javascript\" == doc.lang 
           }"
         }
@@ -192,6 +216,9 @@ curl -X POST http://127.0.0.1:5984/_replicate
           "target": "anik",
           "create_target": true,
           "filter": "default/lang"}'
+\end{code}
+\setparskip
+\begin{response}
 {"ok":true,"session_id":"3546d87233636b04440e6e023c3e3018",
  "source_last_seq":6,
  "replication_id_version":2, "history":
@@ -202,7 +229,8 @@ curl -X POST http://127.0.0.1:5984/_replicate
     "doc_write_failures":0
   }]
 }
-\end{code}
+\end{response}
+\resetparskip
 
 Filter erstellen mit dynamischem Parameter (Auszug):
 
@@ -249,36 +277,52 @@ filter=filter\_name, include\_docs=\brackets{true,false}, timeout=\brackets{mill
 \begin{code}
 curl -X GET "http://127.0.0.1:5984/kina/_changes \
   ?feed=continuous&heartbeat=2000"
+\end{code}
+\setparskip
+\begin{response}
 {"seq":3,"id":"kn0001","changes": \
   [{"rev":"3-5570e8bbb34412db757c2df4bfa1099b"}]}
 {"seq":4,"id":"fab911e6e9ed703bf536dccffe000937","changes": \ 
   [{"rev":"1-183f162a09532ccacf8223f6e2ba95f6"}]}
 [...]
-\end{code}
+\end{response}
+\resetparskip
 
 \subsection{Compaction: Datenbank \htmlverb{POST} \htmlverb{\_compact}}
 
 \begin{code}
 curl -X POST http://127.0.0.1:5984/kina/_compact \
   -H "content-type:application/json"
-{"ok":true}
 \end{code}
+\setparskip
+\begin{response}
+{"ok":true}
+\end{response}
+\resetparskip
 
 \subsection{Compaction: Design Dokumente \htmlverb{POST} \htmlverb{\_compact/design-doc}}
 
 \begin{code}
 curl -X POST http://127.0.0.1:5984/kina/_compact/default \
   -H "content-type:application/json"
-{"ok":true}
 \end{code}
+\setparskip
+\begin{response}
+{"ok":true}
+\end{response}
+\resetparskip
 
 \subsection{Compaction: Views \htmlverb{POST} \htmlverb{\_view\_cleanup}}
 
 \begin{code}
 curl -X POST http://127.0.0.1:5984/kina/_view_cleanup \
   -H "content-type:application/json"
-{"ok":true}
 \end{code}
+\setparskip
+\begin{response}
+{"ok":true}
+\end{response}
+\resetparskip
 
 \section{Dokumente}
 Prinzipiell sollte beim Erstellen auf IDs zurückgegriffen werden, die CouchDB 
@@ -289,22 +333,28 @@ generiert. Allerdings macht es in manchen Fällen auch Sinn eigene IDs zu nutzen
 
 \begin{code}
 curl -X GET http://127.0.0.1:5984/_uuids?count=3
+\end{code}
+\setparskip
+\begin{response}
 {"uuids":
   ["b7fc0ca7dffcc6d0f240c1e5bb000998",
    "b7fc0ca7dffcc6d0f240c1e5bb000fe8",
    "b7fc0ca7dffcc6d0f240c1e5bb001c9a"]
 }
-\end{code}
+\end{response}
+\resetparskip
 
 \subsection{Alle Dokumente erhalten \htmlverb{GET} \htmlverb{\_all\_docs}}
-\emph{(params)} descending=true, key=\brackets{key}, startkey=\brackets{key}, startkey\_docid=\brackets{docid}, \newline
-endkey=\brackets{key}, endkey\_docid=\brackets{docid}, \newline
-group=\brackets{true,false}, group\_level=\brackets{0-n}, inclusive\_end=\brackets{true,false}, \newline
-limit=\brackets{n}, reduce=\brackets{true,false}, skip=\brackets{n}, stale=ok, \newline
+\emph{(params)} descending=true, key=\brackets{key}, st-artkey=\brackets{key}, startkey\_docid=\brackets{docid}, \newline
+endkey=\brackets{key}, endkey\_docid=\brackets{docid}, group=\brackets{true,false}, group\_level=\brackets{0-n}, \newline 
+inclusive\_end=\brackets{true,false}, limit=\brackets{n}, reduce=\brackets{true,false}, skip=\brackets{n}, stale=ok, \newline
 update\_seq=\brackets{true,false}
 
 \begin{code}
 curl -X GET http://127.0.0.1:5984/kina/_all_docs
+\end{code}
+\setparskip
+\begin{response}
 {"total_rows":12,"offset":0,"rows":[
 {"id":"7341477ce373f9cc76f351e5980008bb",
  "key":"7341477ce373f9cc76f351e5980008bb",
@@ -313,7 +363,8 @@ curl -X GET http://127.0.0.1:5984/kina/_all_docs
  "key":"7341477ce373f9cc76f351e5980015cd",
  "value":{"rev":"2-d6f5f2cb326c1f68f95d2bfbef329280"}},
 [...]
-\end{code}
+\end{response}
+\resetparskip
 
 \subsection{Mehrere Dokumente mit key(id) erhalten \htmlverb{POST} \htmlverb{\_all\_docs}}
 \emph{(params)} siehe: Alle Dokumente erhalten \newline
@@ -326,6 +377,9 @@ curl -X POST http://127.0.0.1:5984/kina/_all_docs?include_docs=true
         "fab911e6e9ed703bf536dccffe000937", 
         "7341477ce373f9cc76f351e5980015cd"
       ]}'
+\end{code}
+\setparskip
+\begin{response}
 {"total_rows":12,"offset":0,"rows":[
   {"id":"fab911e6e9ed703bf536dccffe000937",
    "key":"fab911e6e9ed703bf536dccffe000937",
@@ -340,24 +394,33 @@ curl -X POST http://127.0.0.1:5984/kina/_all_docs?include_docs=true
    "_rev":"3-99b698d0caba3c9892a385dd0efe2a3d",
    "lang":"lisp"}}
 ]}
-\end{code}
+\end{response}
+\resetparskip
 
 \subsection{Dokument erstellen mit CouchDB ID \htmlverb{PUT}}
 
 \begin{code}
 curl -X PUT http://127.0.0.1:5984/kina/ \
   b7fc0ca7dffcc6d0f240c1e5bb000998
+\end{code}
+\setparskip
+\begin{response}
 {"ok":true,"id":"b7fc0ca7dffcc6d0f240c1e5bb000998",
  "rev":"1-967a00dff5e02add41819138abb3284d"}
-\end{code}
+\end{response}
+\resetparskip
 
 \subsection{Dokument erstellen mit eigener ID \htmlverb{PUT}}
 
 \begin{code}
 curl -X PUT http://127.0.0.1:5984/kina/kn0001 -d '{}'
+\end{code}
+\setparskip
+\begin{response}
 {"ok":true,"id":"kn0001",
  "rev":"3-5570e8bbb34412db757c2df4bfa1099b"}
-\end{code}
+\end{response}
+\resetparskip
 
 \subsection{Dokument erstellen \htmlverb{POST}}
 
@@ -365,9 +428,13 @@ curl -X PUT http://127.0.0.1:5984/kina/kn0001 -d '{}'
 curl -X POST http://127.0.0.1:5984/kina/
      -H "content-type: application/json"
      -d '{}'
+\end{code}
+\setparskip
+\begin{response}
 {"ok":true,"id":"b7fc0ca7dffcc6d0f240c1e5bb000fe8",
  "rev":"1-367b00dfc5e02axd41819138abb3284d"}
-\end{code}
+\end{response}
+\resetparskip
 
 \subsection{Dokument anfragen \htmlverb{GET}}
 \emph{(params)} rev={[}revision{]}, revs=true, revs\_info=true
@@ -375,59 +442,130 @@ curl -X POST http://127.0.0.1:5984/kina/
 \begin{code}
 curl -X GET http://127.0.0.1:5984/kina/ \
   b7fc0ca7dffcc6d0f240c1e5bb000998
+\end{code}
+\setparskip
+\begin{response}
 {"_id":"b7fc0ca7dffcc6d0f240c1e5bb000998",
  "_rev":"1-367b00dfc5e02axd41819138abb3284d",
  "inhalt":"hier steht was"}
-\end{code}
+\end{response}
+\resetparskip
 
 \subsection{Dokument erweitern / aktualisieren \htmlverb{PUT}}
+\emph{(params)} rev=revision \newline
+\emph{(header)} if-match=revision
 
 \begin{code}
 curl -X PUT http://127.0.0.1:5984/kina/ \
-  b7fc0ca7dffcc6d0f240c1e5bb000998
-     -d '{"_rev":"1-367b00dfc5e02axd41819138abb3284d",
-          "neuer Inhalt": "kommt hier hin",
-          "inhalt": "bestehender wird aktualisiert"}'
-{"ok":true,"id":"7fc0ca7dffcc6d0f240c1e5bb000998",
- "rev":"2-53f21467344e4cb88384fc9e2e189049"}
+  fab911e6e9ed703bf536dccffe000937
+     -d '{"_rev":"1-183f162a09532ccacf8223f6e2ba95f6",
+          "lang": "php"}'
 \end{code}
-
-\subsection{Dokument-Attachment speichern \htmlverb{PUT}}
-\emph{(!)} generell könnte auch nur die Option \mono{data} für eine reine Textdatei verwendet werden
 
 \begin{code}
 curl -X PUT http://127.0.0.1:5984/kina/ \
-  b7fc0ca7dffcc6d0f240c1e5bb000998/ \
-  geburtstag.txt?rev=2-53f21467344e4cb88384fc9e2e189049
-     --data-binary @geburtstag.txt
-     -H "content-type: text/plain;charset=utf-8"
-HTTP/1.1 201 Created
-Server: CouchDB/1.1.0 (Erlang OTP/R14B03)
-Location: http://127.0.0.1:5984/datenbankname/ \
-  b7fc0ca7dffcc6d0f240c1e5bb000998/geburtstag.txt
-Etag: "3-d5171a67e9e27aeba9beac32149a86a9"
-Date: Mon, 07 Feb 2011 22:53:25 GMT
-Content-Type: text/plain;charset=utf-8
-Content-Length: 95
-Cache-Control: must-revalidate
-
-{"ok":true,"id":"b7fc0ca7dffcc6d0f240c1e5bb000998",
- "rev":"3-d5171a67e9e27aeba9beac32149a86a9"}
+  fab911e6e9ed703bf536dccffe000937 
+  -H "if-match:1-183f162a09532ccacf8223f6e2ba95f6" 
+  -d '{"lang":"php"}'
 \end{code}
+\setparskip
+\begin{response}
+{"ok":true,"id":"fab911e6e9ed703bf536dccffe000937",
+ "rev":"2-cf8bad0865d8296870352617ab3afdba"}
+\end{response}
+\resetparskip
 
 \subsection{Dokument löschen \htmlverb{DELETE}}
-\emph{(!)} Dokument wird nur aus dem Index gelöscht und markiert mit \mono{deleted:true}
+\emph{(params)} rev=revision \newline
+\emph{(header)} if-match=revision \newline
+\emph{(!)} Dokument wird nur aus dem Index gelöscht und markiert \newline
+ mit \mono{deleted:true}
 
 \begin{code}
 curl -X DELETE http://127.0.0.1:5984/kina/ \
   7341477ce373f9cc76f351e598001cdd \
   ?rev=1-9533bf3b3c5cda717ed000b186fdafae
-{"ok":true,"id":"7341477ce373f9cc76f351e598001cdd",
- "rev":"2-5c7fb5dfeaf6f7cea149922fa1cdaf96"}
 \end{code}
 
+\begin{code}
+curl -X DELETE http://127.0.0.1:5984/kina/ \
+  7341477ce373f9cc76f351e598001cdd \
+  -H "if-match:1-9533bf3b3c5cda717ed000b186fdafae"
+\end{code}
+\setparskip
+\begin{response}
+{"ok":true,"id":"7341477ce373f9cc76f351e598001cdd",
+ "rev":"2-5c7fb5dfeaf6f7cea149922fa1cdaf96"}
+\end{response}
+\resetparskip
+
+\subsection{Dokument-Attachment speichern \htmlverb{PUT}}
+\emph{(params)} rev=revision \newline
+\emph{(headers)} content-length:\brackets{bytes}, content-type:\brackets{MIME-type document}, if-match:revision
+
+\emph{(!)} generell könnte auch nur die Option \mono{data} für eine reine Textdatei \newline
+verwendet werden
+
+\begin{code}
+curl -X PUT http://127.0.0.1:5984/kina/ \
+  b7fc0ca7dffcc6d0f240c1e5bb000998/ \
+  geburtstag.txt?rev=2-1726cd3e40ffd356591114f014b1ac22
+     --data-binary @geburtstag.txt
+     -H "content-type: text/plain;charset=utf-8"
+\end{code}
+\setparskip
+\begin{response}
+HTTP/1.1 201 Created
+Server: CouchDB/1.1.0 (Erlang OTP/R14B03)
+Location: http://127.0.0.1:5984/datenbankname/ \
+  b7fc0ca7dffcc6d0f240c1e5bb000998/geburtstag.txt
+Etag: "2-1726cd3e40ffd356591114f014b1ac22"
+Date: Mon, 07 Feb 2011 22:53:25 GMT
+Content-Type: text/plain;charset=utf-8
+Content-Length: 66
+Cache-Control: must-revalidate
+
+{"ok":true,"id":"b7fc0ca7dffcc6d0f240c1e5bb000998",
+ "rev":"2-1726cd3e40ffd356591114f014b1ac22"}
+\end{response}
+\resetparskip
+
+\subsection{Dokument-Attachment anfragen \htmlverb{GET}}
+
+\begin{code}
+curl -X GET http://127.0.0.1:5984/kina/ \
+  b7fc0ca7dffcc6d0f240c1e5bb000998/geburtstag.txt
+\end{code}
+\setparskip
+\begin{response}
+HTTP/1.1 200 OK
+Server: CouchDB/1.1.0 (Erlang OTP/R14B03)
+ETag: "2-1726cd3e40ffd356591114f014b1ac22"
+Date: Sun, 28 Aug 2011 20:32:14 GMT
+Content-Type: text/plain;charset=utf-8
+Content-Length: 66
+Cache-Control: must-revalidate
+Accept-Ranges: none
+\end{response}
+\resetparskip
+
+\subsection{Dokument-Attachment löschen \htmlverb{DELETE}}
+\emph{(params)} rev=revision \newline
+\emph{(headers)} if-match:revision
+
+\begin{code}
+curl -X GET http://127.0.0.1:5984/kina/ \
+    b7fc0ca7dffcc6d0f240c1e5bb000998/geburtstag.txt
+\end{code}
+\setparskip
+\begin{response}
+{"ok":true,"id":"b7fc0ca7dffcc6d0f240c1e5bb000998",
+ "rev":"3-f1d8176c2ea671ad75bd85a55dea4d05"}
+\end{response}
+\resetparskip
+
 \subsection{Dokument permanent löschen \htmlverb{POST} \htmlverb{\_purge}}
-\emph{(!)} Refernez zum Dokument wird gelöscht; wird nicht repliziert, um den
+\emph{(!)} Refernez zum Dokument wird gelöscht; wird nicht repliziert. Um den\newline 
 Plattenplatz auch frei zu bekommen, muss \mono{\_compact} ausgeführt werden
 
 \begin{code}
@@ -436,16 +574,53 @@ curl -X POST http://127.0.0.1:5984/kina/_purge/
   -d '{"7341477ce373f9cc76f351e598001cdd": 
         ["2-5c7fb5dfeaf6f7cea149922fa1cdaf96"]
      }'
+\end{code}
+\setparskip
+\begin{response}
 {"purge_seq":1,"purged":{
   "7341477ce373f9cc76f351e598001cdd":
     ["2-5c7fb5dfeaf6f7cea149922fa1cdaf96"]
   }
 }
-\end{code}
+\end{response}
+\resetparskip
 
 \subsection{Dokument Info \htmlverb{HEAD}}
+\emph{(params)} rev=revision, revs=\brackets{true,false}, revs\_info=\brackets{true,false} 
+
+\begin{code}
+curl --head -X GET http://127.0.0.1:5984/kina/ \
+  fab911e6e9ed703bf536dccffe000937?revs=true
+\end{code}
+\setparskip
+\begin{response}
+HTTP/1.1 200 OK
+Server: CouchDB/1.1.0 (Erlang OTP/R14B03)
+Etag: "1-183f162a09532ccacf8223f6e2ba95f6"
+Date: Sun, 28 Aug 2011 14:40:35 GMT
+Content-Type: text/plain;charset=utf-8
+Content-Length: 175
+Cache-Control: must-revalidate
+\end{response}
+\resetparskip
 
 \subsection{Dokument kopieren \htmlverb{COPY}}
+\emph{(i)} Die ID 7341477ce373f9cc76f351e598001d4c wurde zuerst per \_uuids request \newline
+erfragt. Um in ein bestehendes Dokument zu kopieren, wird die ID des Zieldokuments angegeben
+\emph{(header)} Destination:docid \newline
+\emph{(params)} rev=revision
+
+\begin{code}
+curl -X COPY http://127.0.0.1:5984/kina/ \
+  fab911e6e9ed703bf536dccffe000937 
+  -H "destination:7341477ce373f9cc76f351e598001d4c"
+\end{code}
+\setparskip
+\begin{response}
+{"id":"7341477ce373f9cc76f351e598001d4c",
+ "rev":"1-5a5db37cb3735e769ea8d133b28f04a1"}
+\end{response}
+\resetparskip
 
 \subsection{Mehrere Dokumente anlegen \htmlverb{POST} \htmlverb{\_bulk\_docs}}
 \emph{(options)} all\_or\_nothing:\brackets{true,false (=non-atomic=default)}, docs:\brackets{key:value,...}
@@ -457,11 +632,15 @@ curl -X POST http://127.0.0.1:5984/kina/_bulk_docs \
         {"lang":"c"}, 
         {"lang":"c++"}
      ]}'
+\end{code}
+\setparskip
+\begin{response}
 [{"id":"7341477ce373f9cc76f351e5980008bb",
   "rev":"1-f491c132ea24ecf492e0b5ae18467876"},
  {"id":"7341477ce373f9cc76f351e5980015cd",
   "rev":"1-9533bf3b3c5cda717ed000b186fdafae"}]
-\end{code}
+\end{response}
+\resetparskip
 
 \subsection{Mehrere Dokumente aktualisieren \htmlverb{POST} \htmlverb{\_bulk\_docs}}
 \emph{(options)} all\_or\_nothing:\brackets{true,false (=non-atomic=default)}, docs:\brackets{key:value,...}
@@ -477,11 +656,15 @@ curl -X POST http://127.0.0.1:5984/kina/_bulk_docs \
          "_rev":"1-9533bf3b3c5cda717ed000b186fdafae",
          "lang":"lisp"}
     ]}'
+\end{code}
+\setparskip
+\begin{response}
 [{"id":"7341477ce373f9cc76f351e5980008bb",
   "rev":"2-f0bfca3976ad04bce05b2ade242519d7"},
  {"id":"7341477ce373f9cc76f351e5980015cd",
   "rev":"2-d6f5f2cb326c1f68f95d2bfbef329280"}]
-\end{code}
+\end{response}
+\resetparskip
 
 \begin{thebibliography}{sotief}
 \bibitem{1}\url{http://couchdb.apache.org}
