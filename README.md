@@ -4,7 +4,7 @@ This is a cheat-sheet for CouchDB's RESTful API. It's showing the most common an
 an example for each part. 
 
 The motivation for making this cheat-sheet was actually pushed at my job at SinnerSchrader because it was one of my 
-goals for this year. But having written the first German CouchDB book [1](besides Mario Scheliga's "CouchDB kurz & gut" [2]) I
+goals for this year. But having written the first German CouchDB book [1] (besides Mario Scheliga's "CouchDB kurz & gut" [2]) I
 also thought it is a good thing to have. And therefor, this first version is only available in German language. But hey, 
 I will provide a english version as soon as I can finde some time. Or - don't you wanna fork an translate it? 
 
