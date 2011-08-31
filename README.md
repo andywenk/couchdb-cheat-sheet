@@ -1,4 +1,4 @@
-# CouchDB-Cheat-Sheet
+# CouchDB-Cheat-Sheet for CouchDB 1.1.0
 
 This is a cheat-sheet for CouchDB's RESTful API. It's showing the most common and used request commands and shows
 an example for each part. 

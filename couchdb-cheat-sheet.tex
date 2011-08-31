@@ -51,7 +51,7 @@
 
 % title
 \title{CouchDB-Cheat-Sheet}
-\author{Andreas Wenk -- Version: 0.1.0 -- August 2011}
+\author{Andreas Wenk -- Version: 0.2.0 -- August 2011}
 \date{}
 \maketitle
 
@@ -159,9 +159,10 @@ curl -X DELETE http://127.0.0.1:5984/kina
 \subsection{Datenbank replizieren \htmlverb{POST} \htmlverb{\_replicate}}
 \emph{(options)} create\_target:true, cancel:true, continuous:true
 
+\subsubsection{lokal nach lokal}
 \begin{code}
-curl -X POST http://127.0.0.1:5984/_replicate
-     -H "content-type:application/json"
+curl -X POST http://127.0.0.1:5984/_replicate \
+     -H "content-type:application/json" \
      -d '{"source": "kina",
           "target": "anik",
           "create_target": true}'
@@ -183,6 +184,51 @@ curl -X POST http://127.0.0.1:5984/_replicate
      "doc_write_failures":0
   }]
 }
+\end{response}
+\resetparskip
+
+\subsubsection{remote nach lokal (umgekehrt genauso)}
+\emph{(!)} Bei der Nutzung von \mono{create\_target} muss die Authentifizierung mit einem 
+User der Zieldatenbank erfolgen.
+
+\begin{code}
+curl -X POST http://127.0.0.1:5984/_replicate \
+     -H "content-type:application/json" \
+     -d '{"source": "kina",
+          "target": "http://starsky:hutch@couchbuch.iriscouch.com/anik",
+          "create_target": true}'
+\end{code}
+\setparskip
+\begin{response}
+{"ok":true,"session_id":"ed5fa48d0a5ce9cee6941381754d796d",
+  "source_last_seq":29,"replication_id_version":2,
+  "history":
+    [{"session_id":"ed5fa48d0a5ce9cee6941381754d796d",
+      "start_time":"Wed, 31 Aug 2011 19:34:40 GMT",
+      "end_time":"Wed, 31 Aug 2011 19:34:41 GMT",
+      "start_last_seq":0,
+      "end_last_seq":29,"recorded_seq":29,
+      "missing_checked":0,
+      "missing_found":14,
+      "docs_read":14,
+      "docs_written":14,
+      "doc_write_failures":0
+  }]
+}
+\end{response}
+\resetparskip
+
+\subsubsection{remote nach remote}
+\begin{code}
+curl -X POST http://127.0.0.1:5984/_replicate \
+     -H "content-type:application/json" \
+     -d '{"source": "http://andywenk.cloudant.com/kina",
+          "target": "http://starsky:hutch@couchbuch.iriscouch.com/kina",
+          "create_target": true}'
+\end{code}
+\setparskip
+\begin{response}
+{"ok":true,"no_changes":true}
 \end{response}
 \resetparskip
 
@@ -210,8 +256,8 @@ curl -X PUT http://127.0.0.1:5984/kina/_design/default \
 Filter anwenden (davon ausgehend, es gibt drei Dokumente mit lang = javascript):
 
 \begin{code}
-curl -X POST http://127.0.0.1:5984/_replicate
-     -H "content-type:application/json"
+curl -X POST http://127.0.0.1:5984/_replicate \
+     -H "content-type:application/json" \
      -d '{"source": "kina",
           "target": "anik",
           "create_target": true,
@@ -280,9 +326,9 @@ curl -X GET "http://127.0.0.1:5984/kina/_changes \
 \end{code}
 \setparskip
 \begin{response}
-{"seq":3,"id":"kn0001","changes": \
+{"seq":3,"id":"kn0001","changes":
   [{"rev":"3-5570e8bbb34412db757c2df4bfa1099b"}]}
-{"seq":4,"id":"fab911e6e9ed703bf536dccffe000937","changes": \ 
+{"seq":4,"id":"fab911e6e9ed703bf536dccffe000937","changes":
   [{"rev":"1-183f162a09532ccacf8223f6e2ba95f6"}]}
 [...]
 \end{response}
@@ -371,10 +417,10 @@ curl -X GET http://127.0.0.1:5984/kina/_all_docs
 \emph{(!)} gut nutzbar, um mit einem Request mehrere Dokumente zu erhalten
 
 \begin{code}
-curl -X POST http://127.0.0.1:5984/kina/_all_docs?include_docs=true 
-  -H "content-type:application/json" 
+curl -X POST http://127.0.0.1:5984/kina/_all_docs?include_docs=true \
+  -H "content-type:application/json" \
   -d '{"keys": [
-        "fab911e6e9ed703bf536dccffe000937", 
+        "fab911e6e9ed703bf536dccffe000937",
         "7341477ce373f9cc76f351e5980015cd"
       ]}'
 \end{code}
@@ -425,8 +471,8 @@ curl -X PUT http://127.0.0.1:5984/kina/kn0001 -d '{}'
 \subsection{Dokument erstellen \htmlverb{POST}}
 
 \begin{code}
-curl -X POST http://127.0.0.1:5984/kina/
-     -H "content-type: application/json"
+curl -X POST http://127.0.0.1:5984/kina/ \
+     -H "content-type: application/json" \
      -d '{}'
 \end{code}
 \setparskip
@@ -457,15 +503,15 @@ curl -X GET http://127.0.0.1:5984/kina/ \
 
 \begin{code}
 curl -X PUT http://127.0.0.1:5984/kina/ \
-  fab911e6e9ed703bf536dccffe000937
+  fab911e6e9ed703bf536dccffe000937 \
      -d '{"_rev":"1-183f162a09532ccacf8223f6e2ba95f6",
           "lang": "php"}'
 \end{code}
 
 \begin{code}
 curl -X PUT http://127.0.0.1:5984/kina/ \
-  fab911e6e9ed703bf536dccffe000937 
-  -H "if-match:1-183f162a09532ccacf8223f6e2ba95f6" 
+  fab911e6e9ed703bf536dccffe000937 \
+  -H "if-match:1-183f162a09532ccacf8223f6e2ba95f6" \
   -d '{"lang":"php"}'
 \end{code}
 \setparskip
@@ -509,15 +555,15 @@ verwendet werden
 \begin{code}
 curl -X PUT http://127.0.0.1:5984/kina/ \
   b7fc0ca7dffcc6d0f240c1e5bb000998/ \
-  geburtstag.txt?rev=2-1726cd3e40ffd356591114f014b1ac22
-     --data-binary @geburtstag.txt
+  geburtstag.txt?rev=2-1726cd3e40ffd356591114f014b1ac22 \
+     --data-binary @geburtstag.txt \
      -H "content-type: text/plain;charset=utf-8"
 \end{code}
 \setparskip
 \begin{response}
 HTTP/1.1 201 Created
 Server: CouchDB/1.1.0 (Erlang OTP/R14B03)
-Location: http://127.0.0.1:5984/datenbankname/ \
+Location: http://127.0.0.1:5984/datenbankname/
   b7fc0ca7dffcc6d0f240c1e5bb000998/geburtstag.txt
 Etag: "2-1726cd3e40ffd356591114f014b1ac22"
 Date: Mon, 07 Feb 2011 22:53:25 GMT
@@ -569,9 +615,9 @@ curl -X GET http://127.0.0.1:5984/kina/ \
 Plattenplatz auch frei zu bekommen, muss \mono{\_compact} ausgeführt werden
 
 \begin{code}
-curl -X POST http://127.0.0.1:5984/kina/_purge/ 
-  -H "content-type:application/json" 
-  -d '{"7341477ce373f9cc76f351e598001cdd": 
+curl -X POST http://127.0.0.1:5984/kina/_purge/ \
+  -H "content-type:application/json" \
+  -d '{"7341477ce373f9cc76f351e598001cdd":
         ["2-5c7fb5dfeaf6f7cea149922fa1cdaf96"]
      }'
 \end{code}
@@ -612,7 +658,7 @@ erfragt. Um in ein bestehendes Dokument zu kopieren, wird die ID des Zieldokumen
 
 \begin{code}
 curl -X COPY http://127.0.0.1:5984/kina/ \
-  fab911e6e9ed703bf536dccffe000937 
+  fab911e6e9ed703bf536dccffe000937 \
   -H "destination:7341477ce373f9cc76f351e598001d4c"
 \end{code}
 \setparskip
