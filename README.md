@@ -38,7 +38,7 @@ PDF in this repository ;-)
 
 ## What's nex?
 
-_ translate it to english 
+_ translate it to english  
 _ extend it with _design and views  
 
 ## What I ask you for!
