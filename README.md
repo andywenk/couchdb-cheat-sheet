@@ -19,7 +19,7 @@ I would say yes! Some of you may think no. But here is the reason why this paper
 five really good documentation ressources (not speaking of books) for CouchDB? Ok let's say two. Yay! The official CouchDB 
 Wiki [3] and the API docu at couchbase.org [4]. They are both kind of ... ok. What is really missing for CouchDB are 
 examples, examples, examples. I tried to close this gap by providing an exmaple for each request with the full result (at 
-least once). SO that's the reason, why it feels like a book, but is still meant as a cheat-sheet.
+least once). So that's the reason, why it feels like a book, but is still meant as a cheat-sheet.
 
 ## Are there other cheat-sheets for CouchDB?
 
