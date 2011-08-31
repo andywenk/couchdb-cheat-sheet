@@ -38,15 +38,14 @@ PDF in this repository ;-)
 
 ## What's nex?
 
-_ translate it to english
-
-_ extend it with _design and views
+_ translate it to english 
+_ extend it with _design and views  
 
 ## What I ask you for!
 
 This is work in progress. I really encourage you to fork this repo and extend it by yourself. Or do you have any 
 suggestions? Write me an email to andy@nms.de or use the issue tracker here. Thank you! 
 
-[1] 
-[2] 
-[3] http://nosql.mypopescu.com/post/721887139/couchdb-cheat-sheet
+[1] http://wiki.apache.org/couchdb/  
+[2] http://www.couchbase.org/sites/default/files/uploads/all/documentation/couchbase-api.html  
+[3] http://nosql.mypopescu.com/post/721887139/couchdb-cheat-sheet  
