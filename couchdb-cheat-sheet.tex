@@ -283,9 +283,9 @@ Filter erstellen mit dynamischem Parameter (Auszug):
 \begin{code}
 curl [...]
   -d '{"filters":{
-       "lang":·
-         "function(doc, req) {·
-           return req.query.lang == doc.lang·
+       "lang":
+         "function(doc, req) {
+           return req.query.lang == doc.lang
          }"
        }
     }'
