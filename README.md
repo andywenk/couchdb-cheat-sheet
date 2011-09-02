@@ -39,7 +39,7 @@ PDF in this repository ;-)
 
 _ translate it to english  
 _ extend it with _design and views   
-_ extend it with curl _active_tasks
+_ extend it with _active_tasks   
 
 ## What I ask you for!
 
