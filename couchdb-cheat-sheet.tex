@@ -58,10 +58,10 @@
 \begin{abstract}
 Dieses Cheat-Sheet ist eine Übersicht der RESTful API von CouchDB \cite{1}. Das Ziel ist es,
 die gebräuchlichsten Requests jeweils anhand eines Beispiels zu zeigen. Unter \cite{2}
-ist eine CouchDB zu finden, in der die Beispiele nachgestellt werden können (Basic-Auth: ohne 
-Daten `ok' klicken). 
+ist eine CouchDB zu finden, in der die Beispiele nachgestellt werden können (Basic-Auth: ohne
+Daten `ok' klicken).
 
-Eine recht gute API Referenz ist unter \cite{3} zu finden.
+Unter \cite{3} ist die API-Referenz zu finden.
 
 Damit die Listings so kurz als möglich sind, heisst die Datenbank, die als Beispiel dienen
 soll `kina'. Die Grundstruktur der Dokumente in dieser Datenbank ist folgendermaßen:
@@ -74,15 +74,15 @@ soll `kina'. Die Grundstruktur der Dokumente in dieser Datenbank ist folgenderma
 }
 \end{code}
 
-Alle Beispiel-Requests werden unter Verwendung von cURL \cite{10} erstellt. Natürlich kann auch das von 
-CouchDB mitgelieferte Webinterface `Futon' genutzt werden. Allerdings rate ich davon ab, da 
+Alle Beispiel-Requests werden unter Verwendung von cURL \cite{10} erstellt. Natürlich kann auch das von
+CouchDB mitgelieferte Webinterface `Futon' genutzt werden. Allerdings rate ich davon ab, da
 bei der Verwendung von cURL die Betrachtung der HTTP-Response zu wesentlich mehr Verständnis führt.
 \end{abstract}
 
 \section{Überblick}
 
 CouchDB ist eine dokumentbasierte Datenbank und gehört zur Gruppe der NoSQL Datenbanken. CouchDB
-ist ein Apache Open-Source Projekt und liegt aktuell in der Version 1.1.0 vor. Einige wichtige 
+ist ein Apache Open-Source Projekt und liegt aktuell in der Version 1.1.0 vor. Einige wichtige
 Merkmale von CouchDB sind:
 
 \begin{itemize}
@@ -92,7 +92,7 @@ Merkmale von CouchDB sind:
   \item API: HTTP Rest \cite{5}
   \item implementiert ACID \cite{6} über MVCC \cite{7}
   \item CAP Theorem \cite{8}:
-    \begin{itemize} 
+    \begin{itemize}
       \item A (Availability) - ja
       \item P (Partition Tolerance) - ja
       \item C (Consistency) -> Eventual Consistency
@@ -156,8 +156,10 @@ curl -X DELETE http://127.0.0.1:5984/kina
 \end{response}
 \resetparskip
 
-\subsection{Datenbank replizieren \htmlverb{POST} \htmlverb{\_replicate}}
-\emph{(options)} create\_target:true, cancel:true, continuous:true
+\subsection{Datenbank replizieren \htmlverb{POST} \htmlverb{\_replicate} (alte API)}
+\emph{(params)} source=\brackets{url}, target=\brackets{url}, cancel=\brackets{true}, create\_target=\brackets{true},\newline
+continuous=\brackets{true}, doc\_ids=\brackets{doc\_ids\_array}, filter=\brackets{filter\_name},\newline
+proxy=\brackets{url}, query\_params=\brackets{params}
 
 \subsubsection{lokal nach lokal}
 \begin{code}
@@ -188,7 +190,7 @@ curl -X POST http://127.0.0.1:5984/_replicate \
 \resetparskip
 
 \subsubsection{remote nach lokal (umgekehrt genauso)}
-\emph{(!)} Bei der Nutzung von \mono{create\_target} muss die Authentifizierung mit einem 
+\emph{(!)} Bei der Nutzung von \mono{create\_target} muss die Authentifizierung mit einem
 User der Zieldatenbank erfolgen.
 
 \begin{code}
@@ -233,8 +235,6 @@ curl -X POST http://127.0.0.1:5984/_replicate \
 \resetparskip
 
 \subsection{Datenbank replizieren - filter}
-\emph{(options)} filter:filter\_name, query\_params:\{filter\_name:query\_param\},\newline
-doc\_ids: \brackets{docid\_1,docid\_2,docid\_n} \newline
 
 Filter werden in \_design Dokumenten erstellt. Ein Filter kann später bei der Replikation genutzt werden, um nur
 Dokumente zu replizieren, die den im Filter hinterlegten Kriterien entsprechen.
@@ -247,7 +247,7 @@ curl -X PUT http://127.0.0.1:5984/kina/_design/default \
   -d '{"filters":{
         "lang":
           "function(doc, req) {
-            return \"javascript\" == doc.lang 
+            return \"javascript\" == doc.lang
           }"
         }
      }'
@@ -315,6 +315,13 @@ curl [...]
      }'
 \end{code}
 
+\subsection{Datenbank replizieren mit der Datenbank \htmlverb{\_replicate}}
+\emph{(params)} source=\brackets{url}, target=\brackets{url}, cancel=\brackets{true}, create\_target=\brackets{true},\newline
+continuous=\brackets{true}, doc\_ids=\brackets{doc\_ids\_array}, filter=\brackets{filter\_name},\newline
+proxy=\brackets{url}, query\_params=\brackets{params}\newline
+
+Dokumentation unter \cite{11} zu finden
+
 \subsection{Änderungen in der DB verfolgen \htmlverb{GET} \htmlverb{\_changes}}
 \emph{(params)} since=\brackets{sequence\_number}, style=all\_docs, limit=\brackets{n}, \newline
 feed=\brackets{continuous,longpolling}, heartbeat=\brackets{milliseconds} \newline
@@ -331,6 +338,21 @@ curl -X GET "http://127.0.0.1:5984/kina/_changes \
 {"seq":4,"id":"fab911e6e9ed703bf536dccffe000937","changes":
   [{"rev":"1-183f162a09532ccacf8223f6e2ba95f6"}]}
 [...]
+\end{response}
+\resetparskip
+
+\subsection{Aktuelle tasks abfragen \htmlverb{GET} \htmlverb{\_active\_tasks}}
+
+\begin{code}
+curl -X GET http://127.0.0.1:5984/_active_tasks
+\end{code}
+\setparskip
+\begin{response}
+[{"pid":"<0.7356.3>","changes_done":159756,
+  "database":"kina","progress":6,
+  "started_on":1359732010,"total_changes":2292848,
+  "type":"database_compaction","updated_on":1359732068
+}]
 \end{response}
 \resetparskip
 
@@ -371,7 +393,7 @@ curl -X POST http://127.0.0.1:5984/kina/_view_cleanup \
 \resetparskip
 
 \section{Dokumente}
-Prinzipiell sollte beim Erstellen auf IDs zurückgegriffen werden, die CouchDB 
+Prinzipiell sollte beim Erstellen auf IDs zurückgegriffen werden, die CouchDB
 generiert. Allerdings macht es in manchen Fällen auch Sinn eigene IDs zu nutzen.
 
 \subsection{UUIDs ausgeben \htmlverb{GET} \htmlverb{\_uuids}}
@@ -392,7 +414,7 @@ curl -X GET http://127.0.0.1:5984/_uuids?count=3
 
 \subsection{Alle Dokumente erhalten \htmlverb{GET} \htmlverb{\_all\_docs}}
 \emph{(params)} descending=true, key=\brackets{key}, st-artkey=\brackets{key}, startkey\_docid=\brackets{docid}, \newline
-endkey=\brackets{key}, endkey\_docid=\brackets{docid}, group=\brackets{true,false}, group\_level=\brackets{0-n}, \newline 
+endkey=\brackets{key}, endkey\_docid=\brackets{docid}, group=\brackets{true,false}, group\_level=\brackets{0-n}, \newline
 inclusive\_end=\brackets{true,false}, limit=\brackets{n}, reduce=\brackets{true,false}, skip=\brackets{n}, stale=ok, \newline
 update\_seq=\brackets{true,false}
 
@@ -407,8 +429,7 @@ curl -X GET http://127.0.0.1:5984/kina/_all_docs
  "value":{"rev":"2-f0bfca3976ad04bce05b2ade242519d7"}},
 {"id":"7341477ce373f9cc76f351e5980015cd",
  "key":"7341477ce373f9cc76f351e5980015cd",
- "value":{"rev":"2-d6f5f2cb326c1f68f95d2bfbef329280"}},
-[...]
+ "value":{"rev":"2-d6f5f2cb326c1f68f95d2bfbef329280"}}]}
 \end{response}
 \resetparskip
 
@@ -611,7 +632,7 @@ curl -X GET http://127.0.0.1:5984/kina/ \
 \resetparskip
 
 \subsection{Dokument permanent löschen \htmlverb{POST} \htmlverb{\_purge}}
-\emph{(!)} Refernez zum Dokument wird gelöscht; wird nicht repliziert. Um den\newline 
+\emph{(!)} Refernez zum Dokument wird gelöscht; wird nicht repliziert. Um den\newline
 Plattenplatz auch frei zu bekommen, muss \mono{\_compact} ausgeführt werden
 
 \begin{code}
@@ -632,7 +653,7 @@ curl -X POST http://127.0.0.1:5984/kina/_purge/ \
 \resetparskip
 
 \subsection{Dokument Info \htmlverb{HEAD}}
-\emph{(params)} rev=revision, revs=\brackets{true,false}, revs\_info=\brackets{true,false} 
+\emph{(params)} rev=revision, revs=\brackets{true,false}, revs\_info=\brackets{true,false}
 
 \begin{code}
 curl --head -X GET http://127.0.0.1:5984/kina/ \
@@ -675,7 +696,7 @@ curl -X COPY http://127.0.0.1:5984/kina/ \
 curl -X POST http://127.0.0.1:5984/kina/_bulk_docs \
   -H "content-type:application/json" \
   -d '{"docs":[
-        {"lang":"c"}, 
+        {"lang":"c"},
         {"lang":"c++"}
      ]}'
 \end{code}
@@ -715,7 +736,7 @@ curl -X POST http://127.0.0.1:5984/kina/_bulk_docs \
 \begin{thebibliography}{sotief}
 \bibitem{1}\url{http://couchdb.apache.org}
 \bibitem{2}\url{https://cloudant.com/futon/database.html?andywenk%2Fkina}
-\bibitem{3}\url{http://www.couchbase.org/sites/default/files/uploads/all/documentation/couchbase-api.html}
+\bibitem{3}\url{http://wiki.apache.org/couchdb/Reference}
 \bibitem{4}\url{http://www.erlang.org}
 \bibitem{5}\url{http://en.wikipedia.org/wiki/Representational_State_Transfer}
 \bibitem{6}\url{http://en.wikipedia.org/wiki/ACID}
@@ -723,6 +744,7 @@ curl -X POST http://127.0.0.1:5984/kina/_bulk_docs \
 \bibitem{8}\url{http://www.julianbrowne.com/article/viewer/brewers-cap-theorem}
 \bibitem{9}\url{http://en.wikipedia.org/wiki/MapReduce}
 \bibitem{10}\url{http://curl.haxx.se/}
+\bibitem{11}\url{https://gist.github.com/832610}
 \end{thebibliography}
 
 \end{document}
