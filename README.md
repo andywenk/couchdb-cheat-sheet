@@ -50,3 +50,7 @@ suggestions? Write me an email to andy@nms.de or use the issue tracker here. Tha
 [3] http://wiki.apache.org/couchdb/
 [4] http://www.couchbase.org/sites/default/files/uploads/all/documentation/couchbase-api.html
 [5] http://nosql.mypopescu.com/post/721887139/couchdb-cheat-sheet
+
+
+[![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/andywenk/couchdb-cheat-sheet/trend.png)](https://bitdeli.com/free "Bitdeli Badge")
+
