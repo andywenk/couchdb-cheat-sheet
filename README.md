@@ -1,7 +1,7 @@
 # CouchDB-Cheat-Sheet for CouchDB 1.2.0
 
 This is a cheat-sheet for CouchDB's RESTful API. It's showing the most common and used request commands and shows
-an example for each part.
+an example for each part..
 
 The motivation for making this cheat-sheet was actually pushed at my job at SinnerSchrader (no more internals ... sorry ;-) ). But having written the first German CouchDB book [1] - besides Mario Scheliga's "CouchDB kurz & gut" [2] - I
 also thought it is a good thing to have. And therefor, this first version is only available in German language. But hey,
